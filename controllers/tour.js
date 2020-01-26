@@ -1,6 +1,6 @@
 const fs = require('fs');
-
-const tours = JSON.parse(fs.readFileSync(__dirname + './../dev-data/data/tours-simple.json'));
+const tours = JSON.parse(fs.readFileSync(__dirname + '/../dev-data/data/tours-simple.json'));
+//TODO check why in windows the route is: (__dirname + './../dev-data/data/tours-simple.json')
 
 const getTours = (req, res) => {
     res.json({
@@ -15,7 +15,7 @@ const createTour = (req, res) => {
     const newTour = Object.assign({ id: newId }, req.body);
     tours.push(newTour);
 
-    fs.writeFile('../dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
+    fs.writeFile(__dirname + '/../dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
         res.status(201).json({
             status: 'success',
             data: { tour: newTour }
