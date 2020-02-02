@@ -2,6 +2,19 @@ const fs = require('fs');
 const tours = JSON.parse(fs.readFileSync(__dirname + '/../dev-data/data/tours-simple.json'));
 //TODO check why in windows the route is: (__dirname + './../dev-data/data/tours-simple.json')
 
+const checkBody = (req, res, next) => {
+    const { name, price } = req.body;
+
+    if (!name || !price) {
+        return res.status(400).json({
+            status: 'failed',
+            message: 'missing name or price'
+        })
+    }
+
+    next();
+};
+
 const getTours = (req, res) => {
     res.json({
         status: 'success',
@@ -75,5 +88,6 @@ module.exports = {
     createTour,
     getTour,
     updateTour,
-    deleteTour
+    deleteTour,
+    checkBody
 };
