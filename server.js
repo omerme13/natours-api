@@ -6,12 +6,14 @@ const mongoose = require('mongoose');
 const { DATABASE, DATABASE_PASSWORD } = process.env;
 const db = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD);
 
-mongoose.connect(db, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-}).then(() => console.log('connection successful!'))
-
+mongoose
+    .connect(db, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false
+    })
+    .then(() => console.log('connection to database successful!'))
 
 const port = process.env.PORT || 3000;
 
