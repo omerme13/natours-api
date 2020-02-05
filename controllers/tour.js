@@ -1,8 +1,42 @@
 const Tour = require('../models/tour');
 
+// HELPER FUNCTIONS
+const filterTour = query => {
+    const queryObj = {...query};
+    const excluded = ['page', 'sort', 'limit', 'fields'];
+
+    for (let exItem of excluded) {
+        delete queryObj[exItem];
+    }
+
+    let queryStr = JSON.stringify(queryObj);
+
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    const filteredQuery = Tour.find(JSON.parse(queryStr));
+
+    return filteredQuery;
+}
+
+const sortBy = (query, sortStr) => {
+    return sortStr
+        ? query.sort(sortStr.split(',').join(' '))
+        : query.sort('-createdAt');
+}
+
+const limitFields = (query, fieldsStr) => {
+    return fieldsStr
+        ? query.select(fieldsStr.split(',').join(' '))
+        : query.select('-__v');
+}
+
+// CRUD FUNCTIONS
 const getTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+        let query = filterTour(req.query);
+        query = sortBy(query, req.query.sort);
+        query = limitFields(query, req.query.fields);
+
+        const tours = await query;
     
         res.json({
             status: 'success',
@@ -10,6 +44,7 @@ const getTours = async (req, res) => {
             data: { tours }
         });
     } catch (err) {
+        console.log(err)
         res.json({
             status: 'fail',
             message: err
