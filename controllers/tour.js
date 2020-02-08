@@ -1,42 +1,15 @@
 const Tour = require('../models/tour');
+const APIFeatures = require('../utils/apiFeatures');
 
-// HELPER FUNCTIONS
-const filterTour = query => {
-    const queryObj = {...query};
-    const excluded = ['page', 'sort', 'limit', 'fields'];
-
-    for (let exItem of excluded) {
-        delete queryObj[exItem];
-    }
-
-    let queryStr = JSON.stringify(queryObj);
-
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    const filteredQuery = Tour.find(JSON.parse(queryStr));
-
-    return filteredQuery;
-}
-
-const sortBy = (query, sortStr) => {
-    return sortStr
-        ? query.sort(sortStr.split(',').join(' '))
-        : query.sort('-createdAt');
-}
-
-const limitFields = (query, fieldsStr) => {
-    return fieldsStr
-        ? query.select(fieldsStr.split(',').join(' '))
-        : query.select('-__v');
-}
-
-// CRUD FUNCTIONS
 const getTours = async (req, res) => {
     try {
-        let query = filterTour(req.query);
-        query = sortBy(query, req.query.sort);
-        query = limitFields(query, req.query.fields);
+        const features = new APIFeatures(Tour.find(), req.query)
+            .filter()
+            .sortBy()
+            .limitFields()
+            .paginate();
 
-        const tours = await query;
+        const tours = await features.query;
     
         res.json({
             status: 'success',
@@ -45,7 +18,7 @@ const getTours = async (req, res) => {
         });
     } catch (err) {
         console.log(err)
-        res.json({
+        res.status(404).json({
             status: 'fail',
             message: err
         });
@@ -60,11 +33,11 @@ const createTour = async (req, res) => {
         res.status(201).json({
             status: 'success',
             data: { tour: newTour }
-        })
+        });
     } catch (err) {
         res.status(400).json({
             status: 'fail',
-            message: 'Invalid data sent'
+            message: err
         });
     }
 
@@ -123,10 +96,92 @@ const deleteTour = async (req, res) => {
     }
 };
 
+const getTourStats = async (req, res) => {
+    try {
+        const stats = await Tour.aggregate([
+            {
+                $match: { ratingAverage: { $gte: 4.5 } },
+            },
+            {
+                $group: {
+                    _id: { $toUpper: '$difficulty' },
+                    numTours: { $sum: 1 },
+                    numRatings: { $sum: '$ratingQuantity' },
+                    avgRating: { $avg: '$ratingAverage' },
+                    avgPrice: { $avg: '$price' },
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' }
+                }
+            },
+            {
+                $sort: { avgPrice: 1 }
+            }
+        ]);
+        
+        res.json({
+            status: 'success',
+            data: { stats }
+        })
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        })
+    }
+}
+
+const getMonthlyPlan = async (req, res) => {
+    try {
+        const year = +req.params.year;
+
+        const plan = await Tour.aggregate([
+            {
+                $unwind: '$startDates'
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`)
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numTours: { $sum: 1 },
+                    tours: { $push: '$name'}
+                }
+            },
+            {
+                $addFields: { month: '$_id'}
+            },
+            {
+                $project: { _id: 0 }
+            },
+            {
+                $sort: { numTours: -1 }
+            }
+        ]);
+
+        res.json({
+            status: 'success',
+            data: { plan }
+        })
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        })
+    }
+}
+
 module.exports = {
     getTours,
     createTour,
     getTour,
     updateTour,
-    deleteTour
+    deleteTour,
+    getTourStats,
+    getMonthlyPlan
 };
