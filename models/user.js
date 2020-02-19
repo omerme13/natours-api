@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'You must specify a password'],
-        minlength: [8, 'Your password must have at least 8 characters']
+        minlength: [8, 'Your password must have at least 8 characters'],
+        select: false
     },
     confirmPassword: {
         type: String,
@@ -35,7 +36,8 @@ const userSchema = new mongoose.Schema({
             },
             message: 'Passwords are not the same.'
         }
-    }
+    },
+    passwordChangedAt: Date
 });
 
 userSchema.pre('save', async function(next) {
@@ -49,6 +51,22 @@ userSchema.pre('save', async function(next) {
 
     next();
 });
+
+userSchema.methods.isPasswordMatch = async function(password, userPassword) {
+    return await bcrypt.compare(password, userPassword);
+};
+
+userSchema.methods.didChangePassword = function(tokenTimestamp) {
+    if (this.passwordChangedAt) {
+        const changedTimestamp = parseInt(
+            this.passwordChangedAt.getTime() / 1000
+        );
+        
+        return tokenTimestamp < changedTimestamp;
+    }
+
+    return false;
+};
 
 const User = mongoose.model('User', userSchema);
 
