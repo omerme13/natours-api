@@ -13,11 +13,15 @@ router.route('/top-5-cheapest')
     
 router.route('/')
     .get(authMiddleware.verifyToken, tourController.getTours)
-    .post(tourController.createTour)
+    .post(tourController.createTour);
  
 router.route('/:id')
     .get(tourController.getTour)
     .patch(tourController.updateTour)
-    .delete(tourController.deleteTour)
+    .delete(
+        authMiddleware.verifyToken,
+        authMiddleware.restrictTo('lead-guide', 'admin'),
+        tourController.deleteTour
+    );
 
 module.exports = router;

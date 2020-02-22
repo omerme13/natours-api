@@ -41,6 +41,19 @@ const verifyToken = catchAsync(async (req, res, next) => {
     next();
 });
 
+const restrictTo = (...userRoles) => {
+    return (req, res, next) => {
+        const { role } = req.user;
+
+        if (!userRoles.includes(role)) {
+            return next(new AppError('Unauthorized action.', 403));
+        }
+
+        next();
+    }
+};
+
 module.exports = {
-    verifyToken
+    verifyToken,
+    restrictTo
 };
