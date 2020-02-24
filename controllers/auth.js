@@ -17,7 +17,7 @@ const signToken = id => {
     );
 };
 
-const changeToNewPassword = catchAsync(async (req, next) => {
+const changeToNewPassword = async (req, next) => {
     const hashedToken = crypto
         .createHash('sha256')
         .update(req.params.token)
@@ -38,13 +38,9 @@ const changeToNewPassword = catchAsync(async (req, next) => {
     user.passwordResetExpires = undefined;
 
     return user._id;
-});
+};
 
-// ****************
-// ****************
-// ****************
-
-const signin = catchAsync(async (req, res, next) => {
+const authenticate = async (req, next) => {
     const { email, password } = req.body;
     
     if (!email || !password) {
@@ -57,7 +53,18 @@ const signin = catchAsync(async (req, res, next) => {
         return next(new AppError('Incorrect email or password', 401));
     }
 
-    const token = signToken(user._id);
+    return {
+        token: signToken(user._id),
+        user
+    };
+};
+
+// ****************
+// ****************
+// ****************
+
+const signin = catchAsync(async (req, res, next) => {
+    const { token, user } = await authenticate(req, next);
 
     res.json({
         status: 'success',
@@ -120,9 +127,30 @@ const resetPassword = catchAsync(async (req, res, next) => {
     });     
 });
 
+const updatePassword = catchAsync(async (req, res, next) => {
+    const data = await authenticate(req, next);
+    if (!data) {
+        return;
+    }
+
+    const { token, user } = data;
+
+    user.password = req.body.newPassword;
+    user.confirmPassword = req.body.newPasswordConfirm;
+    await user.save();
+
+    res.json({
+        status: 'success',
+        token,
+        data: { user }
+    }); 
+})
+
+
 module.exports = {
     signin,
     signup,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    updatePassword
 };
