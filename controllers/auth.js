@@ -17,6 +17,28 @@ const signToken = id => {
     );
 };
 
+const sendCookie = (res, token) => {
+    res.cookie('jwt', token, {
+        expires: new Date(
+            Date.now() + 
+            process.env.JWT_COOKIE_EXPIRATION_TIME * 24 * 60 * 60 * 1000
+        ),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    });
+};
+
+const sendCookieAndRespond = (res, user, token, statusCode) => {
+    sendCookie(res, token);
+    user.password = undefined;
+
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: { user }
+    }); 
+};
+
 const changeToNewPassword = async (req, next) => {
     const hashedToken = crypto
         .createHash('sha256')
@@ -42,13 +64,13 @@ const changeToNewPassword = async (req, next) => {
 
 const authenticate = async (req, next) => {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
         return next(new AppError('Please provide email and password', 400));
     }
 
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user || !(await user.isPasswordMatch(password, user.password))) {
         return next(new AppError('Incorrect email or password', 401));
     }
@@ -66,22 +88,14 @@ const authenticate = async (req, next) => {
 const signin = catchAsync(async (req, res, next) => {
     const { token, user } = await authenticate(req, next);
 
-    res.json({
-        status: 'success',
-        token,
-        data: { user }
-    }); 
+    sendCookieAndRespond(res, user, token, 200);
 });
 
 const signup = catchAsync(async (req, res, next) => {
     const newUser = await User.create(req.body);
     const token = signToken(newUser._id);
 
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: { user: newUser }
-    }); 
+    sendCookieAndRespond(res, newUser, token, 201);
 });
 
 const forgotPassword = catchAsync(async (req, res, next) => {
@@ -129,6 +143,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
 const updatePassword = catchAsync(async (req, res, next) => {
     const data = await authenticate(req, next);
+    
     if (!data) {
         return;
     }
@@ -139,12 +154,8 @@ const updatePassword = catchAsync(async (req, res, next) => {
     user.confirmPassword = req.body.newPasswordConfirm;
     await user.save();
 
-    res.json({
-        status: 'success',
-        token,
-        data: { user }
-    }); 
-})
+    sendCookieAndRespond(res, user, token, 200);
+});
 
 
 module.exports = {
