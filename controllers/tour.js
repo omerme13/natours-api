@@ -3,7 +3,6 @@ const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-
 const getTours = catchAsync(async (req, res, next) => {
     const features = new APIFeatures(Tour.find(), req.query)
         .filter()
@@ -41,8 +40,6 @@ const getTour = catchAsync(async (req, res, next) => {
         data: { tour }
     });
 });
-
-
 
 const updateTour = catchAsync(async (req, res, next) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -98,7 +95,7 @@ const getTourStats = catchAsync(async (req, res, next) => {
         status: 'success',
         data: { stats }
     })
-})
+});
 
 const getMonthlyPlan = catchAsync(async (req, res, next) => {
     const year = +req.params.year;
