@@ -1,5 +1,7 @@
 const express = require('express');
+
 const tourController = require('../controllers/tour');
+const reviewController = require('../controllers/review');
 const tourMiddleware = require('../middleware/tour');
 const authMiddleware = require('../middleware/auth');
 
@@ -24,4 +26,12 @@ router.route('/:id')
         tourController.deleteTour
     );
 
+router.route('/:tourId/reviews')
+    .post(
+        authMiddleware.verifyToken,
+        authMiddleware.restrictTo('user'),
+        reviewController.createReview
+    )
+    .get(reviewController.getReviews);
+    
 module.exports = router;

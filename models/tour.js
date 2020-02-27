@@ -106,11 +106,19 @@ const tourSchema = new mongoose.Schema({
     ]
 },
 {
-    toJSON: { virtuals: true }
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 tourSchema.virtual('durationWeeks').get(function() {
     return this.duration / 7;
+});
+
+// virtual populate
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'tour'
 });
 
 // DOCUMENT MIDDLEWARE: runs only for save() and create()

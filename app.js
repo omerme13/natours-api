@@ -7,6 +7,7 @@ const hpp = require('hpp');
 
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
+const reviewRouter = require('./routers/review');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error');
 const securityMiddleware = require('./middleware/security');
@@ -28,6 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // middleware that handles unrecognized URLs
 app.all('*', (req, res, next) => {
