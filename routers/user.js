@@ -2,6 +2,7 @@ const express = require('express');
 const userController = require('../controllers/user');
 const authController = require('../controllers/auth');
 const authMiddleware = require('../middleware/auth');
+const userMiddleware = require('../middleware/user');
 
 const router = express.Router();
 
@@ -15,10 +16,14 @@ router.patch('/update-password', authMiddleware.verifyToken, authController.upda
 router.patch('/update-me', authMiddleware.verifyToken, userController.updateMe);
 router.delete('/delete-me', authMiddleware.verifyToken, userController.deleteMe);
 
-router.route('/')
-    .get(userController.getUsers)
-    .post(userController.createUser);
- 
+router.route('/').get(userController.getUsers);
+
+router.route('/me').get(
+    authMiddleware.verifyToken,
+    userMiddleware.getMe,
+    userController.getUser
+);
+
 router.route('/:id')
     .get(userController.getUser)
     .patch(userController.updateUser)

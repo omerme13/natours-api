@@ -1,11 +1,13 @@
 const express = require('express');
 
 const tourController = require('../controllers/tour');
-const reviewController = require('../controllers/review');
 const tourMiddleware = require('../middleware/tour');
 const authMiddleware = require('../middleware/auth');
+const reviewRouter = require('../routers/review');
 
 const router = express.Router();
+
+router.use('/:tourId/reviews', reviewRouter);
 
 router.route('/tour-stats').get(tourController.getTourStats);
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
@@ -25,13 +27,5 @@ router.route('/:id')
         authMiddleware.restrictTo('lead-guide', 'admin'),
         tourController.deleteTour
     );
-
-router.route('/:tourId/reviews')
-    .post(
-        authMiddleware.verifyToken,
-        authMiddleware.restrictTo('user'),
-        reviewController.createReview
-    )
-    .get(reviewController.getReviews);
     
 module.exports = router;
