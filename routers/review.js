@@ -6,20 +6,20 @@ const reviewMiddleware = require("../middleware/review");
 
 const router = express.Router({ mergeParams: true });
 
-router
-    .route('/')
+// this middleware verifies that the user is authenticated. if this fails it won't get to the other middleware below.
+router.use(authMiddleware.verifyToken);
+
+router.route('/')
     .get(reviewController.getReviews)
     .post(
-        authMiddleware.verifyToken,
         authMiddleware.restrictTo('user'),
         reviewMiddleware.setTourUserId,
         reviewController.createReview
     );
 
 router.route('/:id')
-        //TODO authentication for this route
-        .delete(reviewController.deleteReview)
-        .get(reviewController.getReview)
-        .patch(reviewController.updateReview);
+    .get(reviewController.getReview)
+    .delete(authMiddleware.restrictTo('user', 'admin'), reviewController.deleteReview)
+    .patch(authMiddleware.restrictTo('user', 'admin'), reviewController.updateReview);
 
 module.exports = router;
