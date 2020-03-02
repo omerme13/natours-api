@@ -19,6 +19,11 @@ router.route('/monthly-plan/:year').get(
 router.route('/top-5-cheapest')
     .get(tourMiddleware.aliasTopTours, tourController.getTours);
     
+router.route('/tours-within/:distance/center/:latLng/unit/:unit')
+    .get(tourController.getToursWithin);
+
+router.route('/distances/:latLng/unit/:unit').get(tourController.getDistances);   
+    
 router.route('/')
     .get(tourController.getTours)
     .post(
