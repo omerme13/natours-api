@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
@@ -7,6 +8,7 @@ const hpp = require('hpp');
 
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
+const viewRouter = require('./routers/view');
 const reviewRouter = require('./routers/review');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error');
@@ -20,6 +22,10 @@ app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 app.use(xss());
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+
 const whitelist = ['duration', 'ratingQuantity', 'ratingAverage', 'maxGroupSize', 'difficulty', 'price'];
 app.use(hpp({ whitelist }));
 
@@ -27,6 +33,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
