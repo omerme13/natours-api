@@ -13,6 +13,8 @@ const getToken = (req, next) => {
         req.headers.authorization.startsWith('Bearer')
     ) {
         token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {  // enabled by cookie-parser package
+        token = req.cookies.jwt;
     }
 
     if (!token) {
@@ -41,6 +43,29 @@ const verifyToken = catchAsync(async (req, res, next) => {
     next();
 });
 
+// only for rendered pages, no errors.
+const isLoggedIn = catchAsync(async (req, res, next) => {
+    if (!req.cookies.jwt) {
+        return next();
+    }
+    
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+
+    const authorizedUser = await User.findById(decoded.id);
+    if (!authorizedUser) {
+        return next();
+    }
+
+    if (authorizedUser.didChangePassword(decoded.iat)) {
+        return next();
+    }
+
+    // if it reaches this point it means there is a logged in user.
+    res.locals.user = authorizedUser;
+
+    next();
+});
+
 const restrictTo = (...userRoles) => {
     return (req, res, next) => {
         const { role } = req.user;
@@ -55,5 +80,6 @@ const restrictTo = (...userRoles) => {
 
 module.exports = {
     verifyToken,
-    restrictTo
+    restrictTo,
+    isLoggedIn
 };

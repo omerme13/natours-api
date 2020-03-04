@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
@@ -19,6 +20,7 @@ const app = express();
 app.use(helmet());
 app.use('/api', securityMiddleware.limiter);
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(xss());
 

@@ -22,7 +22,15 @@ const getOverview = catchAsync(async (req, res, next) => {
     });
 });
 
+const getLoginPage = (req, res) => {
+
+    res.render('login', {
+        title: 'Log into your account'
+    });
+}
+
 module.exports = {
     getTour,
-    getOverview
+    getOverview,
+    getLoginPage
 };
