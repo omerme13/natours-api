@@ -44,27 +44,32 @@ const verifyToken = catchAsync(async (req, res, next) => {
 });
 
 // only for rendered pages, no errors.
-const isLoggedIn = catchAsync(async (req, res, next) => {
-    if (!req.cookies.jwt) {
-        return next();
-    }
+const isLoggedIn = async (req, res, next) => {
+    try {
+
+        if (!req.cookies.jwt) {
+            return next();
+        }
+        
+        const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
     
-    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-
-    const authorizedUser = await User.findById(decoded.id);
-    if (!authorizedUser) {
+        const authorizedUser = await User.findById(decoded.id);
+        if (!authorizedUser) {
+            return next();
+        }
+    
+        if (authorizedUser.didChangePassword(decoded.iat)) {
+            return next();
+        }
+    
+        // if it reaches this point it means there is a logged in user.
+        res.locals.user = authorizedUser;
+    
+        next();
+    } catch (err) {
         return next();
     }
-
-    if (authorizedUser.didChangePassword(decoded.iat)) {
-        return next();
-    }
-
-    // if it reaches this point it means there is a logged in user.
-    res.locals.user = authorizedUser;
-
-    next();
-});
+};
 
 const restrictTo = (...userRoles) => {
     return (req, res, next) => {

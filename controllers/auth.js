@@ -131,6 +131,15 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     }
 });
 
+const logout = (req, res) => {
+    res.cookie('jwt', 'logout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+
+    res.json({ status: 'success' });
+};
+
 const resetPassword = catchAsync(async (req, res, next) => {
     const userId = await changeToNewPassword(req, next);
     const token = signToken(userId);
@@ -161,7 +170,8 @@ const updatePassword = catchAsync(async (req, res, next) => {
 module.exports = {
     signin,
     signup,
+    logout,
     forgotPassword,
     resetPassword,
-    updatePassword
+    updatePassword,
 };
