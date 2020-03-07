@@ -39,6 +39,7 @@ const verifyToken = catchAsync(async (req, res, next) => {
 
     // assigning the authorizedUser data to the req object allow the next middleware to access that data
     req.user = authorizedUser;
+    res.locals.user = authorizedUser;
 
     next();
 });

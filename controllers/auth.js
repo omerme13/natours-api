@@ -65,6 +65,11 @@ const changeToNewPassword = async (req, next) => {
 const authenticate = async (req, next) => {
     const { email, password } = req.body;
 
+    // in case of updating the current user's password. there is no email in the body we take the data from the logged in user.
+    if (!email) {
+        email = req.user.email;
+    }
+
     if (!email || !password) {
         return next(new AppError('Please provide email and password', 400));
     }

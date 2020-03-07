@@ -7,8 +7,9 @@ const router = express.Router();
 
 router.use(authMiddleware.isLoggedIn);
 
-router.get('/', viewController.getOverview);
-router.get('/tour/:slug', viewController.getTour);
-router.get('/login', viewController.getLoginPage);
+router.get('/', authMiddleware.isLoggedIn, viewController.getOverview);
+router.get('/tour/:slug', authMiddleware.isLoggedIn, viewController.getTour);
+router.get('/login', authMiddleware.isLoggedIn, viewController.getLoginPage);
+router.get('/me', authMiddleware.isLoggedIn, viewController.getAccount);
 
 module.exports = router;    

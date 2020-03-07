@@ -32,10 +32,17 @@ const getLoginPage = (req, res) => {
     res.render('login', {
         title: 'Log into your account'
     });
+};
+
+const getAccount = (req, res) => {
+    res.render('account', {
+        title: 'Your account'
+    });
 }
 
 module.exports = {
     getTour,
     getOverview,
-    getLoginPage
+    getLoginPage,
+    getAccount
 };
