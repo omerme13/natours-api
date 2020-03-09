@@ -8464,10 +8464,7 @@ var logout = /*#__PURE__*/function () {
           case 0:
             _context2.prev = 0;
             _context2.next = 3;
-            return (0, _axios.default)({
-              method: 'GET',
-              url: 'http://localhost:3000/api/v1/users/logout'
-            });
+            return (0, _axios.default)('http://localhost:3000/api/v1/users/logout');
 
           case 3:
             res = _context2.sent;
@@ -8523,19 +8520,19 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 var updateSettings = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(data, isUpdatingPassword) {
-    var url, email, _res, res;
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dataToUpdate, isUpdatingPassword) {
+    var url, data, _res, email, res;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             url = "http://localhost:3000/api/v1/users/".concat(isUpdatingPassword ? 'update-password' : 'update-me');
-            email = undefined;
+            data = dataToUpdate;
             _context.prev = 2;
 
             if (!isUpdatingPassword) {
-              _context.next = 8;
+              _context.next = 9;
               break;
             }
 
@@ -8545,38 +8542,39 @@ var updateSettings = /*#__PURE__*/function () {
           case 6:
             _res = _context.sent;
             email = _res.data.data.data.email;
+            data = _objectSpread({
+              email: email
+            }, data);
 
-          case 8:
-            _context.next = 10;
+          case 9:
+            _context.next = 11;
             return (0, _axios.default)({
               method: 'PATCH',
               url: url,
-              data: _objectSpread({
-                email: email
-              }, data)
+              data: data
             });
 
-          case 10:
+          case 11:
             res = _context.sent;
 
             if (res.status === 200) {
               (0, _alerts.default)('success', 'Updated successfully');
             }
 
-            _context.next = 17;
+            _context.next = 18;
             break;
 
-          case 14:
-            _context.prev = 14;
+          case 15:
+            _context.prev = 15;
             _context.t0 = _context["catch"](2);
             (0, _alerts.default)('error', _context.t0.response.data.message);
 
-          case 17:
+          case 18:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[2, 14]]);
+    }, _callee, null, [[2, 15]]);
   }));
 
   return function updateSettings(_x, _x2) {
@@ -8953,13 +8951,12 @@ var submitLoginForm = function submitLoginForm(e) {
 };
 
 var submitDataForm = function submitDataForm(e) {
-  var name = document.querySelector('#name').value;
-  var email = document.querySelector('#email').value;
-  (0, _updateSettings.updateSettings)({
-    name: name,
-    email: email
-  }, false);
   e.preventDefault();
+  var form = new FormData();
+  form.append('name', document.querySelector('#name').value);
+  form.append('email', document.querySelector('#email').value);
+  form.append('photo', document.querySelector('#photo').files[0]);
+  (0, _updateSettings.updateSettings)(form, false);
 };
 
 var submitSettingsForm = /*#__PURE__*/function () {
@@ -9046,7 +9043,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45311" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33695" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

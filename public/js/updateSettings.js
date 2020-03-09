@@ -2,23 +2,24 @@ import axios from 'axios';
 
 import showAlert from './alerts';
 
-export const updateSettings = async (data, isUpdatingPassword) => {
+export const updateSettings = async (dataToUpdate, isUpdatingPassword) => {
     const url = `http://localhost:3000/api/v1/users/${
         isUpdatingPassword ? 'update-password' : 'update-me'
     }`;
 
-    let email = undefined;
+    let data = dataToUpdate;
 
     try {
         if (isUpdatingPassword) {
             const res = await axios('http://localhost:3000/api/v1/users/me');
-            email = res.data.data.data.email;
+            const email = res.data.data.data.email;
+            data = { email, ...data };
         }
 
         const res = await axios({
             method: 'PATCH',
             url,
-            data: { email, ...data }
+            data
         });
     
         if (res.status === 200) {
