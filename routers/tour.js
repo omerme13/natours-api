@@ -37,6 +37,8 @@ router.route('/:id')
     .patch(
         authMiddleware.verifyToken,
         authMiddleware.restrictTo('lead-guide', 'admin'),
+        tourMiddleware.uploadTourPhotos,
+        tourMiddleware.resizeTourImages,
         tourController.updateTour
     )
     .delete(

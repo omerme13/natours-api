@@ -1,6 +1,7 @@
 const multer = require('multer');
 const jimp = require('jimp');
 
+const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 // const multerStorage = multer.diskStorage({
@@ -28,7 +29,7 @@ const upload = multer({
     fileFilter: multerFilter
 });
 
-const resizeUserPhoto = async (req, res, next) => {
+const resizeUserPhoto = catchAsync(async (req, res, next) => {
     if (!req.file) {
         return next();
     }
@@ -43,7 +44,7 @@ const resizeUserPhoto = async (req, res, next) => {
         .write(`public/img/users/${req.file.filename}`)
     
     next();
-};
+});
 
 const uploadUserPhoto = upload.single('photo');
 
