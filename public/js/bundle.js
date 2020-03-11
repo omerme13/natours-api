@@ -8415,7 +8415,7 @@ var login = /*#__PURE__*/function () {
             _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
-              url: 'http://localhost:3000/api/v1/users/signin',
+              url: '/api/v1/users/signin',
               data: {
                 email: email,
                 password: password
@@ -8464,7 +8464,7 @@ var logout = /*#__PURE__*/function () {
           case 0:
             _context2.prev = 0;
             _context2.next = 3;
-            return (0, _axios.default)('http://localhost:3000/api/v1/users/logout');
+            return (0, _axios.default)('/api/v1/users/logout');
 
           case 3:
             res = _context2.sent;
@@ -8527,7 +8527,7 @@ var updateSettings = /*#__PURE__*/function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            url = "http://localhost:3000/api/v1/users/".concat(isUpdatingPassword ? 'update-password' : 'update-me');
+            url = "/api/v1/users/".concat(isUpdatingPassword ? 'update-password' : 'update-me');
             data = dataToUpdate;
             _context.prev = 2;
 
@@ -8537,7 +8537,7 @@ var updateSettings = /*#__PURE__*/function () {
             }
 
             _context.next = 6;
-            return (0, _axios.default)('http://localhost:3000/api/v1/users/me');
+            return (0, _axios.default)('/api/v1/users/me');
 
           case 6:
             _res = _context.sent;
@@ -8625,7 +8625,7 @@ var bookTour = /*#__PURE__*/function () {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return (0, _axios.default)("http://localhost:3000/api/v1/bookings/checkout-sessions/".concat(tourId));
+            return (0, _axios.default)("/api/v1/bookings/checkout-sessions/".concat(tourId));
 
           case 3:
             res = _context.sent;

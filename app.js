@@ -6,6 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
@@ -35,6 +36,8 @@ app.use(hpp({ whitelist }));
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
+app.use(compression());
 
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);

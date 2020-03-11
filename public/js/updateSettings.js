@@ -3,7 +3,7 @@ import axios from 'axios';
 import showAlert from './alerts';
 
 export const updateSettings = async (dataToUpdate, isUpdatingPassword) => {
-    const url = `http://localhost:3000/api/v1/users/${
+    const url = `/api/v1/users/${
         isUpdatingPassword ? 'update-password' : 'update-me'
     }`;
 
@@ -11,7 +11,7 @@ export const updateSettings = async (dataToUpdate, isUpdatingPassword) => {
 
     try {
         if (isUpdatingPassword) {
-            const res = await axios('http://localhost:3000/api/v1/users/me');
+            const res = await axios('/api/v1/users/me');
             const email = res.data.data.data.email;
             data = { email, ...data };
         }

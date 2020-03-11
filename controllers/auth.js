@@ -102,7 +102,6 @@ const signup = catchAsync(async (req, res, next) => {
     const url = `${req.protocol}://${req.get('host')}/me`;
 
     await new Email(newUser, url).sendWelcome();
-    console.log(url)
     sendCookieAndRespond(res, newUser, token, 201);
 });
 
