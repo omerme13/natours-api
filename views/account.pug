@@ -1,8 +1,8 @@
 extends base
 
-mixin listItem(isActive, icon, title)
+mixin listItem(isActive, icon, title, link)
     li(class=isActive ? 'side-nav--active' : '')
-        a(href='#')
+        a(href=link)
             svg
                 use(xlink:href=`img/icons.svg#icon-${icon}`)
             | #{title}
@@ -13,10 +13,10 @@ block content
         .user-view
             nav.user-view__menu
                 ul.side-nav
-                    +listItem(true, 'settings', 'Settings')
-                    +listItem(true, 'briefcase', 'My bookings')
-                    +listItem(true, 'star', 'My reviews')
-                    +listItem(true, 'credit-card', 'Billing')
+                    +listItem(true, 'settings', 'Settings', '#')
+                    +listItem(true, 'briefcase', 'My bookings', '/my-tours')
+                    +listItem(true, 'star', 'My reviews', '#')
+                    +listItem(true, 'credit-card', 'Billing', '#')
 
                 - if (user.role === 'admin')
                     .admin-nav

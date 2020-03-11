@@ -11,6 +11,7 @@ const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
 const viewRouter = require('./routers/view');
 const reviewRouter = require('./routers/review');
+const bookingRouter = require('./routers/booking');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error');
 const securityMiddleware = require('./middleware/security');
@@ -39,6 +40,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // middleware that handles unrecognized URLs
 app.all('*', (req, res, next) => {

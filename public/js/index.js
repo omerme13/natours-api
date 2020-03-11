@@ -1,6 +1,7 @@
 import '@babel/polyfill';
 import { login, logout } from './auth';
 import { updateSettings, clearFields } from './updateSettings';
+import { bookTour } from './stripe';
 import displayMap from './mapbox';
 
 const mapBox = document.querySelector('#map');
@@ -8,6 +9,7 @@ const loginForm = document.querySelector('.form--login');
 const logoutButton = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userSettingsForm = document.querySelector('.form-user-settings');
+const bookTourBtn = document.querySelector('#book-tour');
 
 
 const submitLoginForm = e => {
@@ -51,6 +53,11 @@ const submitSettingsForm = async e => {
     clearFields('password-current', 'password', 'password-confirm')
 };
 
+const bookTourHandler = e => {
+    e.target.textContent = 'Booking...';
+    bookTour(bookTourBtn.dataset.tourId);
+};
+
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     displayMap(locations);
@@ -66,4 +73,7 @@ if (userDataForm) {
 }
 if (userSettingsForm) {
     userSettingsForm.addEventListener('submit', submitSettingsForm);
+}
+if (bookTourBtn) {
+    bookTourBtn.addEventListener('click', bookTourHandler);
 }
