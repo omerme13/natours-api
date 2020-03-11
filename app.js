@@ -7,6 +7,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
@@ -19,6 +20,9 @@ const securityMiddleware = require('./middleware/security');
 
 const app = express();
 app.enable('trust proxy');
+
+app.use(cors());
+app.options('*', cors());
 
 app.use(helmet());
 app.use('/api', securityMiddleware.limiter);
