@@ -17,19 +17,19 @@ const signToken = id => {
     );
 };
 
-const sendCookie = (res, token) => {
+const sendCookie = (req, res, token) => {
     res.cookie('jwt', token, {
         expires: new Date(
             Date.now() + 
             process.env.JWT_COOKIE_EXPIRATION_TIME * 24 * 60 * 60 * 1000
         ),
-        secure: process.env.NODE_ENV === 'production',
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
         httpOnly: true
     });
 };
 
-const sendCookieAndRespond = (res, user, token, statusCode) => {
-    sendCookie(res, token);
+const sendCookieAndRespond = (req, res, user, token, statusCode) => {
+    sendCookie(req, res, token);
     user.password = undefined;
 
     res.status(statusCode).json({
@@ -93,7 +93,7 @@ const authenticate = async (req, next) => {
 const signin = catchAsync(async (req, res, next) => {
     const { token, user } = await authenticate(req, next);
 
-    sendCookieAndRespond(res, user, token, 200);
+    sendCookieAndRespond(req, res, user, token, 200);
 });
 
 const signup = catchAsync(async (req, res, next) => {
@@ -102,7 +102,7 @@ const signup = catchAsync(async (req, res, next) => {
     const url = `${req.protocol}://${req.get('host')}/me`;
 
     await new Email(newUser, url).sendWelcome();
-    sendCookieAndRespond(res, newUser, token, 201);
+    sendCookieAndRespond(req, res, newUser, token, 201);
 });
 
 const forgotPassword = catchAsync(async (req, res, next) => {
@@ -164,7 +164,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
     user.confirmPassword = req.body.newPasswordConfirm;
     await user.save();
 
-    sendCookieAndRespond(res, user, token, 200);
+    sendCookieAndRespond(req, res, user, token, 200);
 });
 
 

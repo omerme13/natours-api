@@ -18,6 +18,7 @@ const globalErrorHandler = require('./controllers/error');
 const securityMiddleware = require('./middleware/security');
 
 const app = express();
+app.enable('trust proxy');
 
 app.use(helmet());
 app.use('/api', securityMiddleware.limiter);
