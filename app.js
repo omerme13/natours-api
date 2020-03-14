@@ -14,6 +14,7 @@ const tourRouter = require('./routers/tour');
 const viewRouter = require('./routers/view');
 const reviewRouter = require('./routers/review');
 const bookingRouter = require('./routers/booking');
+const bookingController = require('./controllers/booking');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error');
 const securityMiddleware = require('./middleware/security');
@@ -23,6 +24,12 @@ app.enable('trust proxy');
 
 app.use(cors());
 app.options('*', cors());
+
+// we include it here because it's important for it to be before 'express.json()'
+app.post('/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+    bookingController.webhookCheckout
+);
 
 app.use(helmet());
 app.use('/api', securityMiddleware.limiter);
