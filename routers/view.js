@@ -1,10 +1,12 @@
 const express = require('express');
 
 const viewController = require('../controllers/view');
-const bookingController = require('../controllers/booking');
 const authMiddleware = require('../middleware/auth');
+const viewMiddleware = require('../middleware/view');
 
 const router = express.Router();
+
+router.use(viewMiddleware.alerts);
 
 router.use(authMiddleware.isLoggedIn);
 

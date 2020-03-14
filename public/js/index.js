@@ -3,6 +3,7 @@ import { login, logout } from './auth';
 import { updateSettings, clearFields } from './updateSettings';
 import { bookTour } from './stripe';
 import displayMap from './mapbox';
+import showAlert from './alerts';
 
 const mapBox = document.querySelector('#map');
 const loginForm = document.querySelector('.form--login');
@@ -76,4 +77,10 @@ if (userSettingsForm) {
 }
 if (bookTourBtn) {
     bookTourBtn.addEventListener('click', bookTourHandler);
+}
+
+const alertMessage = document.querySelector('body').dataset.alert;
+
+if (alertMessage) {
+    showAlert('success', alertMessage, 15);
 }
